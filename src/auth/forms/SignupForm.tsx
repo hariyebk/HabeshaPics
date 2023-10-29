@@ -11,9 +11,6 @@ import { useToast } from "@/components/ui/use-toast"
 import { useCreateAccount, useSignInAccount } from "@/lib/react-query/queriesAndMutations"
 import { useUserContext } from "@/context/AuthContext"
 
-
-
-
 function SignupForm() {
     const {toast} = useToast()
     const {isPending: isCreatingUser, mutateAsync: createNewUser} = useCreateAccount()

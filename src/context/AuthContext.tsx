@@ -32,6 +32,7 @@ function AuthProvider({children}: {children: React.ReactNode}) {
     const navigate = useNavigate()
 
     const checkAuthUser = async() => {
+        setIsLoading(true)
         try{
             // fetching the current user from the session
             const currentUser = await getCurrentUser()
@@ -65,8 +66,8 @@ function AuthProvider({children}: {children: React.ReactNode}) {
     // will be exuted on initial render
     useEffect(() => {
         // If there is no cookie stored in the users localstorage, redirect the user to /sign-in
-        // localStorage.getItem("cookieFallback") === null
-        if(localStorage.getItem("cookieFallback") === '[]'
+        if(localStorage.getItem("cookieFallback") === '[]' ||
+        localStorage.getItem("cookieFallback") === null
         ){
             navigate("/sign-in")
         }
