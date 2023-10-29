@@ -6,14 +6,21 @@ import { Input } from "@/components/ui/input"
 import { signupValidation } from "@/lib/validation"
 import { z } from "zod"
 import { Loader } from "lucide-react"
-import { Link } from "react-router-dom"
-import { createUserAccount } from "@/lib/appwrite/api"
+import { Link, useNavigate } from "react-router-dom"
+import { useToast } from "@/components/ui/use-toast"
+import { useCreateAccount, useSignInAccount } from "@/lib/react-query/queriesAndMutations"
+import { useUserContext } from "@/context/AuthContext"
 
 
 
 
 function SignupForm() {
-    const isLoading = false
+    const {toast} = useToast()
+    const {isPending: isCreatingUser, mutateAsync: createNewUser} = useCreateAccount()
+    const { mutateAsync: signInAccount} = useSignInAccount()
+    const {checkAuthUser} = useUserContext()
+    const navigate = useNavigate()
+
     // Form from react hook form 
     const form = useForm<z.infer<typeof signupValidation>>({
         resolver: zodResolver(signupValidation),
@@ -26,10 +33,38 @@ function SignupForm() {
     })
     // OnSubmit handler
     async function onSubmit(values: z.infer<typeof signupValidation>) {
-            // create new user
-        const newUser = await createUserAccount(values)
-        console.log(newUser)
+        // create new user
+        const newUser = await createNewUser(values)
+        // If the process of creating a new user in the database failed
+        if(!newUser){
+        return toast({
+            title: "Sign up failed. please try again",
+            })
+        } 
+        // creating a session and logging-in the user
+        const session = await signInAccount({
+            email: values.email,
+            password: values.password
+        })
+
+        if(!session){
+            return toast({
+                title: "sign in failed. please try again"
+            })
+        }    
+        // checks if the user is logged-in and a session is created, and then it a adds the user to the global state.
+        const LoggedIn = await checkAuthUser()
+
+        if(LoggedIn){
+            form.reset()
+            navigate("/")
+        }
+        else{
+            return toast({title: "Sign-in failed. please try again"})
+        
+        }
     }
+
     return (
         <Form {...form}>
             <div className="sm:w-420 flex-center flex-col ">
@@ -43,7 +78,7 @@ function SignupForm() {
                     name="name"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Name</FormLabel>
+                        <FormLabel className="shad-form_label">Name</FormLabel>
                         <FormControl>
                             <Input type="text" className="shad-input" {...field} />
                         </FormControl>
@@ -57,7 +92,7 @@ function SignupForm() {
                     name="username"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>User name</FormLabel>
+                        <FormLabel className="shad-form_label">User name</FormLabel>
                         <FormControl>
                             <Input type="text" className="shad-input" {...field} />
                         </FormControl>
@@ -71,7 +106,7 @@ function SignupForm() {
                     name="email"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel className="shad-form_label">Email</FormLabel>
                         <FormControl>
                             <Input type="text" className="shad-input" {...field} />
                         </FormControl>
@@ -85,7 +120,7 @@ function SignupForm() {
                     name="password"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Password</FormLabel>
+                        <FormLabel className="shad-form_label">Password</FormLabel>
                         <FormControl>
                             <Input type="password" className="shad-input" {...field} />
                         </FormControl>
@@ -94,7 +129,7 @@ function SignupForm() {
                     )}
                 />
                     <Button type="submit" className="shad-button_primary mt-3">
-                        {isLoading ? (
+                        {isCreatingUser ? (
                             <div className="flex-center gap-2">
                                 <Loader /> Loading
                             </div>
