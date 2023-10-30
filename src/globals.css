@@ -45,7 +45,7 @@
   }
 
   .body-bold {
-    @apply text-[18px] font-bold leading-[140%];
+    @apply text-[16px] font-bold leading-[140%];
   }
 
   .body-medium {
@@ -223,7 +223,7 @@
   }
 
   .leftsidebar-link {
-    @apply rounded-lg base-medium hover:bg-primary-500 transition;
+    @apply rounded-lg base-medium p-2 w-52  hover:bg-primary-500 transition;
   }
 
   /* Post Card */

@@ -92,5 +92,15 @@ export async function getCurrentUser(){
     }
     
 }
+export async function SignOutAccount() {
+    try{
+        const session = await account.deleteSession("current")
+        return session
+    }
+    catch(error){
+        console.log(error)
+    }
+    
+}
 
 
