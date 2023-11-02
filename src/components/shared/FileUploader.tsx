@@ -7,9 +7,9 @@ interface FileUploaderProps{
     mediaUrl: string
 }
 
-export default function FileUploader({fieldchange} : FileUploaderProps) {
+export default function FileUploader({fieldchange, mediaUrl} : FileUploaderProps) {
     const [file, setFile] = useState<File[]>([])
-    const [fileUrl , setFileUrl] = useState('')
+    const [fileUrl , setFileUrl] = useState(mediaUrl || '')
     // when the user drags and drops, onDrop will be excuted
     const onDrop = useCallback((acceptedFiles: FileWithPath[]) => {
         // set the file state to dropped file
@@ -20,7 +20,7 @@ export default function FileUploader({fieldchange} : FileUploaderProps) {
     }, [file])
 
     const {getRootProps, getInputProps} = useDropzone({onDrop, accept: {
-        'image/*': ['.png', '.jpeg', '.jpg', 'svg', 'webp']
+        'image/*': ['.png', '.jpeg', '.jpg', '.svg', '.webp']
     }})
     return (
     <div {...getRootProps()} className='flex flex-center flex-col bg-dark-3 rounded-xl cursor-pointer'>

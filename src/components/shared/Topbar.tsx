@@ -36,7 +36,7 @@ export default function Topbar() {
                     {/* USER PROFILE */}
                     <Link to={`/profile/${user.id} `} className='flex gap-3' >
                         {/* PROFILE IMAGE */}
-                        <img src={user.imageUrl || '/assets/images/profile-placeholder.svg'} alt='profile' 
+                        <img src={user.imageUrl || '/assets/icons/profile-placeholder.svg'} alt='profile' 
                         className='h-8 w-8 rounded-full'/>
                     </Link>
                 </div>

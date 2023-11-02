@@ -1,13 +1,13 @@
-import React from 'react'
 
 function Loader() {
     return (
         <div className='flex-center w-full'>
             <img
-            src='/assets/icons/loader.svg'
+            src='/assets/icons/spinner.svg'
             alt='loader'
-            width={24}
-            height={24}
+            width={46}
+            height={46}
+            className='animate-spin'
             />
         </div>
     )
