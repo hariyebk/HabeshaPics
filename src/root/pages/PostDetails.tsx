@@ -54,7 +54,7 @@ export default function PostDetails() {
                             <img src="/assets/icons/edit.svg" width={24} height={24} alt="edit" />
                         </Link>
                         {/* DELETE POST */}
-                        <Button onClick={handleDelete} variant='ghost' className= {`${user.id !== post?.creator.$id && "ghost_details_delete-btn"}`}>
+                        <Button onClick={handleDelete} variant='ghost' className= {`${user.id !== post?.creator.$id ? 'hidden': "ghost_details_delete-btn"}`}>
                             <img src="/assets/icons/delete.svg" width={24} height={24} alt="delete" />
                         </Button>
                     </div>

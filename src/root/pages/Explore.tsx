@@ -2,14 +2,18 @@ import GridPostList from "@/components/shared/GridPostList";
 import Loader from "@/components/shared/Loader";
 import SearchResults from "@/components/shared/SearchResults";
 import { Input } from "@/components/ui/input";
+import { useUserContext } from "@/context/AuthContext";
 import useDebounce from "@/hooks/useDebounce";
-import { useGetPosts, useSearchPosts } from "@/lib/react-query/queriesAndMutations";
+import { useGetCurrentUser, useGetPosts, useSearchPosts } from "@/lib/react-query/queriesAndMutations";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
 export default function Explore() {
     // Getting all posts 
     const {data: posts, fetchNextPage, hasNextPage} = useGetPosts()
+    const {data: currentUser} = useGetCurrentUser()
+    // The Explore page should display all posts made by other creators not the current user. in other words when the user opens the explore page , they shouldn't see their own posts. 
+    const filteredPosts = posts?.pages.find((items) => items?.documents.length > 0)?.documents.filter((post) => post.creator.accountId !== currentUser?.accountId)
     // search value (controlled element)
     const [searchValue, setSearchValue] = useState('')
     // Looking for when the user reached the bootom of the viewPort scrooling, to implement infinite scrolling
@@ -33,10 +37,15 @@ export default function Explore() {
             </div>
         )
     }
+    if(filteredPosts?.length === 0){
+        return (
+            <div className='flex items-center h-full w-full'>
+                <p className='text-light-4  text-center w-full mt-10'> No posts to display </p>
+            </div>
+        )
+    }
     // If there is a search value , display search results.
     const shouldShowSearchResults = searchValue !== ''
-    // display the posts if there is no search value and there are posts
-    const shouldShowPosts =  !shouldShowSearchResults && posts.pages.every((item => item?.documents.length === 0))
     return (
         <div className="explore-container">
             {/* SEARCH */}
@@ -65,12 +74,8 @@ export default function Explore() {
                 {shouldShowSearchResults ? (
                 <SearchResults searchedPosts={searchedPosts} isSearchFetching = {isSearchFetching}
                 />
-                ) : shouldShowPosts ? (
-                <p className="text-light-4 mt-10 text-center w-full">End of posts</p>
                 ) : (
-                posts.pages.map((item, index) => (
-                    <GridPostList key={`page-${index}`} posts= {item?.documents}/>
-                ))
+                <GridPostList posts={filteredPosts} showOnlyLikes = {true}/>
                 )}
             </div>
             {

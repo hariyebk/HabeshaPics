@@ -6,8 +6,9 @@ import { useEffect, useState } from "react"
 type PostStatsProps = {
     post: Models.Document,
     userId: string,
+    showOnlyLikes?: boolean
 }
-export default function PostStats({post, userId}: PostStatsProps) {
+export default function PostStats({post, userId, showOnlyLikes = false}: PostStatsProps) {
     
     // likeList is just the collection of user Id's that liked the post
     const likesList: string[] = post.likes.map((user: Models.Document) => user.$id)
@@ -56,21 +57,31 @@ export default function PostStats({post, userId}: PostStatsProps) {
     }
     return (
     <div className="flex justify-between items-center z-20 mt-10">
-        <div className='flex gap-2 mr-5'>
+        {showOnlyLikes ? <div className='flex gap-2 mr-5'>
             {/* LIKES, COMMENTS AND SHARES */}
             <div className='flex justify-between items-center'>
                 <img src={likes.includes(userId) ? '/assets/icons/liked.svg': '/assets/icons/like.svg'} alt='like' width={20} height={20} className='cursor-pointer' onClick={handleLikePost} />
                 <p className='small-medium lg:base-medium ml-2 lg:ml-2'> {likes.length}  </p>
             </div>
         </div>
-        {/* SAVE POST */}
-        <div>
-            {
-                isSaving || isDeletingSavedPost ? 
-                <Loader /> :
-                <img src={isSaved ? '/assets/icons/saved.svg': '/assets/icons/save.svg'} alt='save' width={20} height={20} className='cursor-pointer' onClick={handleSavePost} />
-            }
-        </div>
+        :
+        <>
+            <div className='flex gap-2 mr-5'>
+                {/* LIKES, COMMENTS AND SHARES */}
+                <div className='flex justify-between items-center'>
+                    <img src={likes.includes(userId) ? '/assets/icons/liked.svg': '/assets/icons/like.svg'} alt='like' width={20} height={20} className='cursor-pointer' onClick={handleLikePost} />
+                    <p className='small-medium lg:base-medium ml-2 lg:ml-2'> {likes.length}  </p>
+                </div>
+            </div>
+            <div>
+                {
+                    isSaving || isDeletingSavedPost ? 
+                    <Loader /> :
+                    <img src={isSaved ? '/assets/icons/saved.svg': '/assets/icons/save.svg'} alt='save' width={20} height={20} className='cursor-pointer' onClick={handleSavePost} />
+                }
+            </div>
+        </>
+        }
     </div>
     )
 }
