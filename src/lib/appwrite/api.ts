@@ -1,6 +1,6 @@
 import { INewPost, INewUser, IUpdatePost} from "@/types";
 import { account, appwriteConfig, avatars, databases, storage} from "./config";
-import { ID } from "appwrite";
+import { ID, Models } from "appwrite";
 import {Query} from "appwrite"
 
 export async function createUserAccount(user: INewUser) {
@@ -330,4 +330,49 @@ export async function deletePost(postId: string, imageId: string) {
     catch(error){
         console.log(error)
     }   
+}
+export async function getInfinitePosts({pageParam}: {pageParam: string}) {
+    // A query to get the most recent 20 posts
+    const query = [Query.orderDesc('$updatedAt'), Query.limit(20)]
+    if(pageParam){
+        query.push(Query.cursorAfter(pageParam))
+    }
+    try{
+        const posts = await databases.listDocuments(
+            appwriteConfig.databaseId,
+            appwriteConfig.postCollectionId,
+            query
+        )
+        if(!posts) throw Error
+        return posts
+    }
+    catch(error){
+        console.log(error)
+    }
+}
+export async function searchPosts(searchTerm: string) {
+    try{
+        // search posts by their caption
+        const posts = await databases.listDocuments(
+            appwriteConfig.databaseId,
+            appwriteConfig.postCollectionId,
+            [Query.search('caption', searchTerm)]
+        )
+        if(!posts){
+            const allPosts = await databases.listDocuments(
+                appwriteConfig.databaseId,
+                appwriteConfig.postCollectionId,
+                []
+            )
+            if(!allPosts) throw Error
+            const targetPost = allPosts.documents.find((post: Models.Document) => post.caption.split(' ').includes(searchTerm))
+            if(targetPost) return targetPost
+            else throw Error
+        }
+        return posts
+    }
+    catch(error){
+        console.log(error)
+    }
+    
 }

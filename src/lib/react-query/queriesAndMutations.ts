@@ -1,7 +1,11 @@
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
-import { SignInAccount, SignOutAccount, createPost, createUserAccount, getRecentPosts, likePosts, savePost, deleteSavedPost, getCurrentUser, getPostById, updatePost, deletePost } from "../appwrite/api"
+import {useInfiniteQuery, useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
+import { SignInAccount, SignOutAccount, createPost, createUserAccount, getRecentPosts, likePosts, savePost, deleteSavedPost, getCurrentUser, getPostById, updatePost, deletePost, getInfinitePosts, searchPosts } from "../appwrite/api"
 import { INewPost, INewUser, IUpdatePost } from "@/types"
 import { QUERY_KEYS} from "./queryKeys"
+
+interface IGetPostsResponse {
+    documents: any[];
+}
 
 export const useCreateAccount = () => {
     return useMutation({
@@ -134,5 +138,29 @@ export const useDeletePost = () => {
                 queryKey: [QUERY_KEYS.GET_RECENT_POSTS]
             })
         }
+    })
+}
+export const useGetPosts = () => {
+    return useInfiniteQuery({
+        queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
+        queryFn: getInfinitePosts,
+        getNextPageParam: (lastPage): number | null => {
+        // If there's no data, there are no more pages.
+        if (lastPage && lastPage.documents.length === 0) {
+            return null;
+        }
+        // Use the $id of the last document as the cursor.
+        const lastId = parseInt(lastPage?.documents[lastPage?.documents.length - 1].$id!);
+        return lastId;
+        }, 
+        initialPageParam: 1
+    });
+};
+export const useSearchPosts = (searchTerm: string) => {
+    return useQuery({
+        queryKey: [QUERY_KEYS.SEARCH_POSTS, searchTerm],
+        queryFn: () => searchPosts(searchTerm),
+        // enable re-fetching when the searchTerm is changed
+        enabled: Boolean(searchTerm)
     })
 }

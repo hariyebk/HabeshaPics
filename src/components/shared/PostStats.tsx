@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 
 type PostStatsProps = {
     post: Models.Document,
-    userId: string
+    userId: string,
 }
 export default function PostStats({post, userId}: PostStatsProps) {
     
@@ -41,9 +41,6 @@ export default function PostStats({post, userId}: PostStatsProps) {
         // UPDATE IT ON THE DATABASE
         likepost({postId: post.$id, likesArray: newLikes})
     }
-    function handleCommentPost(){
-
-    }
     function handleSavePost(e: React.MouseEvent){
         e.stopPropagation()
         // If the post was saved before, delete that post from the saved posts collection
@@ -63,11 +60,7 @@ export default function PostStats({post, userId}: PostStatsProps) {
             {/* LIKES, COMMENTS AND SHARES */}
             <div className='flex justify-between items-center'>
                 <img src={likes.includes(userId) ? '/assets/icons/liked.svg': '/assets/icons/like.svg'} alt='like' width={20} height={20} className='cursor-pointer' onClick={handleLikePost} />
-                <p className='small-medium lg:base-medium ml-1 lg:ml-2'> {likes.length}  </p>
-            </div>
-            <div className='flex justify-between items-center ml-2'>
-                <img src='/assets/icons/comment.png' width={20} height={20} alt='comment' className='cursor-pointer' onClick={handleCommentPost}/>
-                <p className='small-medium lg:base-medium ml-1 lg:ml-2'> 3 comments </p>
+                <p className='small-medium lg:base-medium ml-2 lg:ml-2'> {likes.length}  </p>
             </div>
         </div>
         {/* SAVE POST */}

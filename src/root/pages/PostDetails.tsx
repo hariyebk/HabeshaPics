@@ -1,16 +1,18 @@
+import Loader from "@/components/shared/Loader"
 import PostStats from "@/components/shared/PostStats"
 import { Button } from "@/components/ui/button"
 import { useUserContext } from "@/context/AuthContext"
 import { useGetPostById } from "@/lib/react-query/queriesAndMutations"
 import { formatDistanceFromNow } from "@/lib/utils"
-import { Loader } from "lucide-react"
-import { Link, useParams } from "react-router-dom"
+
+import { Link, useNavigate, useParams } from "react-router-dom"
 
 
 export default function PostDetails() {
     const {id: postId} = useParams()
     const {user} = useUserContext()
     const {data: post, isLoading: isGettingPost} = useGetPostById(postId || '')
+    const navigate = useNavigate()
     function handleDelete(){
 
     }
@@ -75,6 +77,12 @@ export default function PostDetails() {
                     {/* POST STATS */}
                     <div>
                         <PostStats post={post!}  userId= {user.id}/>
+                    </div>
+                    {/* GO BACK */}
+                    <div className="flex justify-end items-center mt-12">
+                        <Button onClick={() => navigate(-1)} variant = "outline">
+                                Go Back
+                        </Button>
                     </div>
                 </div>
             </div>
