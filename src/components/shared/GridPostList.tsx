@@ -23,17 +23,21 @@ export default function GridPostList({posts, showUser = true, showStats = true, 
                         <img src={post.imageUrl} alt='post' className='h-full w-full object-cover'/>
                     </Link>
                     <div className='grid-post_user'>
-                        {showUser && (
+                        {showUser ? (
                             <div className='flex items-center justify-start flex-1 gap-2 -mb-9'>
                                 <img src={post.creator?.imageUrl || user.imageUrl} alt='creator' className='h-8 w-8 rounded-full' />
                                 <p className='line-clamp-1'>{ post.creator?.name || user?.name}</p>
                             </div>
                         )
+                        :
+                        showStats ? showOnlyLikes ? (
+                        <PostStats post={post} userId= {user.id} showOnlyLikes = {true}/>
+                        )
+                        : (
+                            <PostStats post={post} userId= {user.id}/>
+                        )
+                        : null
                         }
-                        {
-                            showStats ? showOnlyLikes ? <PostStats post={post} userId= {user.id} showOnlyLikes = {true}/> : <PostStats post={post} userId= {user.id}/>: null
-                        }
-
                     </div>
                     </li>
                 )

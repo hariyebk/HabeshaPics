@@ -5,11 +5,11 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/
 import { Input } from "@/components/ui/input"
 import { signupValidation } from "@/lib/validation"
 import { z } from "zod"
-import { Loader } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
 import { useToast } from "@/components/ui/use-toast"
 import { useCreateAccount, useSignInAccount } from "@/lib/react-query/queriesAndMutations"
 import { useUserContext } from "@/context/AuthContext"
+import Loader from "@/components/shared/Loader"
 
 function SignupForm() {
     const {toast} = useToast()

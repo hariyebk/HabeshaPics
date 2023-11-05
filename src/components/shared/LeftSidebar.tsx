@@ -11,7 +11,6 @@ export default function LeftSidebar() {
     const {mutate: signOut, isSuccess} = useSignOutAccount()
     const {pathname} = useLocation()
     const navigate = useNavigate()
-
     useEffect(() => {
         if(isSuccess){
             navigate(0)

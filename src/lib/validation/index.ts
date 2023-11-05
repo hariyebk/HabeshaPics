@@ -19,3 +19,12 @@ export const createPostValifation = z.object({
     location: z.string().min(2).max(100),
     tags: z.string(),
 })
+
+export const EditProfiletValifation = z.object({
+    file: z.custom<File[]>(),
+    name: z.string().min(2).max(50),
+    username: z.string().min(2).max(50),
+    email: z.string().email(),
+    bio: z.string()
+})
+

@@ -14,7 +14,7 @@ export default function Saved() {
             </div>
         )
     }
-    if(posts.length === 0){
+    if(!posts || posts?.length === 0){
         return (
             <div className='flex items-center h-full w-full'>
                 <p className='text-light-4  text-center w-full mt-10'> You have no saved posts </p>

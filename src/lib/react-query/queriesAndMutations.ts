@@ -1,11 +1,9 @@
 import {useInfiniteQuery, useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
-import { SignInAccount, SignOutAccount, createPost, createUserAccount, getRecentPosts, likePosts, savePost, deleteSavedPost, getCurrentUser, getPostById, updatePost, deletePost, getInfinitePosts, searchPosts } from "../appwrite/api"
+import { SignInAccount, SignOutAccount, createPost, createUserAccount, getRecentPosts, likePosts, savePost, deleteSavedPost, getCurrentUser, getPostById, updatePost, deletePost, getInfinitePosts, searchPosts, getAllUsers, getAllPosts, getUserById } from "../appwrite/api"
 import { INewPost, INewUser, IUpdatePost } from "@/types"
 import { QUERY_KEYS} from "./queryKeys"
+import { toast } from "@/components/ui/use-toast";
 
-interface IGetPostsResponse {
-    documents: any[];
-}
 
 export const useCreateAccount = () => {
     return useMutation({
@@ -19,7 +17,7 @@ export const useSignInAccount = () => {
 }
 export const useSignOutAccount = () => {
     return useMutation({
-        mutationFn: SignOutAccount
+        mutationFn: SignOutAccount,
     })
 }
 export const useCreatePost = () => {
@@ -155,12 +153,31 @@ export const useGetPosts = () => {
         }, 
         initialPageParam: 1
     });
-};
+}
 export const useSearchPosts = (searchTerm: string) => {
     return useQuery({
         queryKey: [QUERY_KEYS.SEARCH_POSTS, searchTerm],
         queryFn: () => searchPosts(searchTerm),
         // enable re-fetching when the searchTerm is changed
         enabled: Boolean(searchTerm)
+    })
+}
+export const useGetAllUsers = () => {
+    return useQuery({
+        queryKey: [QUERY_KEYS.GET_USERS],
+        queryFn: getAllUsers
+    })
+}
+export const useGetAllPosts = () => {
+    return useQuery({
+        queryKey: [QUERY_KEYS.GET_ALL_POSTS],
+        queryFn: getAllPosts
+    })
+}
+export const useGetUserById = (userId: string) => {
+    return useQuery({
+        queryKey: [QUERY_KEYS.GET_USER_BY_ID, userId],
+        queryFn: () => getUserById(userId),
+        enabled: Boolean(userId)
     })
 }

@@ -2,6 +2,7 @@ import { INewPost, INewUser, IUpdatePost} from "@/types";
 import { account, appwriteConfig, avatars, databases, storage} from "./config";
 import { ID, Models } from "appwrite";
 import {Query} from "appwrite"
+import { useQuery } from "@tanstack/react-query";
 
 export async function createUserAccount(user: INewUser) {
 try{
@@ -94,6 +95,7 @@ catch(error){
 export async function SignOutAccount() {
 try{
     const session = await account.deleteSession("current")
+    console.log(session)
     return session
 }
 catch(error){
@@ -370,6 +372,52 @@ export async function searchPosts(searchTerm: string) {
             else throw Error
         }
         return posts
+    }
+    catch(error){
+        console.log(error)
+    }
+    
+}
+export async function getAllUsers() {
+    try{
+        const allUsers = await databases.listDocuments(
+            appwriteConfig.databaseId,
+            appwriteConfig.userCollectionId,
+            [Query.orderDesc('$updatedAt')]
+        )
+        if(!allUsers) throw Error
+        return allUsers
+    }
+    catch(error){
+        console.log(error)
+    }
+    
+}
+export async function getAllPosts() {
+    try{
+        const allposts = await databases.listDocuments(
+            appwriteConfig.databaseId,
+            appwriteConfig.postCollectionId,
+            [Query.orderDesc('$updatedAt')]
+        )
+        if(!allposts) throw Error
+        return allposts
+    }
+    catch(error){
+        console.log(error)
+    }
+    
+}
+export async function getUserById(userId: string) {
+    if(!userId) throw Error
+    try{
+        const user = await databases.getDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.userCollectionId,
+            userId
+        )
+        if(!user) throw Error
+        return user
     }
     catch(error){
         console.log(error)
