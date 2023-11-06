@@ -6,51 +6,64 @@ import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
 import { Textarea } from '@/components/ui/textarea'
-import FileUploader from '@/components/shared/FileUploader'
 import { Input } from '@/components/ui/input'
-import { useCallback, useState } from 'react';
-import { FileWithPath, useDropzone } from 'react-dropzone';
-
-
+import ProfilePhotoUploader from '../shared/ProfilePhotoUploader';
+import { useUpdateUser } from '@/lib/react-query/queriesAndMutations';
+import { useToast } from '../ui/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 type EditProfileFormProps = {
-    user?: Models.Document;
+    user: Models.Document;
 }
 
 export default function EditProfileForm({user}: EditProfileFormProps) {
-    const [file, setFile] = useState<File[]>([])
+    const {mutateAsync: updateUser, isPending: isUpdatingUser} = useUpdateUser()
+    const navigate = useNavigate()
+    const {toast} = useToast()
     const form = useForm<z.infer<typeof  EditProfiletValifation>>({
         resolver: zodResolver( EditProfiletValifation),
         defaultValues: {
             file: [],
-            name: user?.name,
-            username: user?.username,
-            email: user?.email ,
-            bio: user?.bio
+            name: user.name,
+            username: user.username,
+            email: user.email ,
+            bio: user.bio
         },
     })
-    // when the user drags and drops, onDrop will be excuted
-    const onDrop = useCallback((acceptedFiles: FileWithPath[]) => {
-        // set the file state to dropped file
-        setFile(acceptedFiles)
-        fieldchange(acceptedFiles)
-        // 
-        setFileUrl(URL.createObjectURL(acceptedFiles[0]))
-    }, [file])
-    const {getRootProps, getInputProps} = useDropzone({onDrop, accept: {
-        'image/*': ['.png', '.jpeg', '.jpg', '.svg', '.webp']
-    }})
-    async function onSubmit(values: z.infer<typeof EditProfiletValifation>) {
-        console.log(values)
-        
+
+    async function handleUpdate(values: z.infer<typeof EditProfiletValifation>) {
+        const updatedUser = updateUser({
+            ...values,
+            userId: user.$id,
+            imageId: user.imageId,
+            imageUrl: user.imageUrl,
+        })
+        if(!updatedUser){
+            toast({title: 'failed to update user. please try again', variant: "destructive"})
+            throw Error
+        }
+        console.log(updateUser)
+        navigate(`/profile/${user.$id}`)        
     }
     return (
         <Form {...form}>
-            <div className='flex flex-1 justify-start items-center gap-3 w-full h-full py-5'>
-                <img src={user?.imageUrl} width={60} height={60} alt='profile-image' className='rounded-full' />
-                <p className='text-light-4 small-medium cursor-pointer'> Change profile photo </p>
-            </div>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-9 w-full max-w-5xl">
+            <form onSubmit={form.handleSubmit(handleUpdate)} className="flex flex-col gap-9 w-full max-w-5xl">
+                {/* CHANGE PROFILE PHOTO */}
+                <FormField
+                control={form.control}
+                name="file"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormControl>
+                        <ProfilePhotoUploader
+                        fieldchange = {field.onChange}
+                        mediaUrl = {user?.imageUrl}
+                        />
+                    </FormControl>
+                    <FormMessage className='shad-form_message' />
+                    </FormItem>
+                )}
+                />
                 {/* NAME */}
                 <FormField
                 control={form.control}
@@ -108,10 +121,10 @@ export default function EditProfileForm({user}: EditProfileFormProps) {
                 )}
                 />
                 <div className='flex gap-4 items-center justify-end'>
-                    <Button type='button' className='shad-button_dark_4'>
+                    <Button type='button' className='shad-button_dark_4' onClick={() => navigate(-1)}>
                         cancel
                     </Button>
-                    <Button type='submit' className='shad-button_primary whitespace-nowrap'>
+                    <Button type='submit' className='shad-button_primary whitespace-nowrap' disabled = {isUpdatingUser}>
                         Update Profile
                     </Button>
                 </div>

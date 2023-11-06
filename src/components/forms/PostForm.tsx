@@ -130,7 +130,7 @@ export default function PostForm({post}: PostFormProps) {
             )}
             />
             <div className='flex gap-4 items-center justify-end'>
-                <Button type='button' className='shad-button_dark_4'>
+                <Button type='button' className='shad-button_dark_4' onClick={() => navigate(-1)}>
                     cancel
                 </Button>
                 <Button type='submit' className='shad-button_primary whitespace-nowrap' disabled = {isPosting || isUpdatingPost}>

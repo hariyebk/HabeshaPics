@@ -1,8 +1,7 @@
-import { INewPost, INewUser, IUpdatePost} from "@/types";
+import { INewPost, INewUser, IUpdatePost, IUpdateUser} from "@/types";
 import { account, appwriteConfig, avatars, databases, storage} from "./config";
 import { ID, Models } from "appwrite";
 import {Query} from "appwrite"
-import { useQuery } from "@tanstack/react-query";
 
 export async function createUserAccount(user: INewUser) {
 try{
@@ -303,7 +302,7 @@ export async function updatePost(post: IUpdatePost) {
             tags: tags,
         }
         );
-        // If it fails to create a new post in the database, delete the post from the storage.
+        // If it fails to create an updated post in the database, delete the post from the storage.
         if (!updatePost) {
         await deleteFile(image.imageId);
         throw Error;
@@ -418,6 +417,111 @@ export async function getUserById(userId: string) {
         )
         if(!user) throw Error
         return user
+    }
+    catch(error){
+        console.log(error)
+    }
+    
+}
+export async function updateUser(user: IUpdateUser) {
+    // check if the user wants to update his profile image
+    const hasPhotoToUpdate = user.file.length > 0
+    try {
+        //  If the user updates his profile photo, imageUrl and imageId will be replaced with new image url and id that comes from the storage. else it stays the same from the old.
+        let image = {
+            imageUrl: user.imageUrl,
+            imageId: user.imageId
+        }
+        if(hasPhotoToUpdate){
+            // Upload photo to appwrite storage
+            const uploadedPhoto = await uploadFile(user.file[0]);
+            if (!uploadedPhoto) throw Error;
+            // Get photo url
+            const fileUrl = getFilePreview(uploadedPhoto.$id);
+            if (!fileUrl) {
+            // If it failed to get the photo url , delete the file.
+            await deleteFile(uploadedPhoto.$id);
+            throw Error;
+            }
+            image = { ...image, imageUrl: fileUrl, imageId: uploadedPhoto.$id }
+        }
+        // update the user
+        const updatedUser = await databases.updateDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.userCollectionId,
+            user.userId,
+            {
+                name: user.name,
+                username: user.username,
+                email: user.email,
+                bio: user.bio,
+                imageUrl: image.imageUrl,
+                imageId: image.imageId
+            }
+        )
+        // If updating the user failed for some reason , delete the profile photo from the storage.
+        if (!updatedUser) {
+            await deleteFile(image.imageId);
+            throw Error;
+        }
+            return updatedUser;
+    }
+    catch(error){
+        console.log(error)
+    }
+}
+export async function follow(followedId: string, followerId: string) {
+    try{
+        // First update the followers count of the person being followed
+        const updateFollowed = await databases.updateDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.userCollectionId,
+            followedId,
+            {
+                followers: [followerId]
+            }
+        )
+        if(!updateFollowed) throw Error
+        // Second update the following count of the person who followed the other person
+        const updateFollower = await databases.updateDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.userCollectionId,
+            followerId,
+            {
+                following: [followedId]
+            }
+        )
+        if(!updateFollower) throw Error
+        return {status: 'ok'}
+    }
+    catch(error){
+        console.log(error)
+    }
+    
+}
+export async function unfollow(followedId: string, newFollowersList: string[], followerId: string, newFollowingList: string[]) {
+    try{
+        // remove the current follower from the followers list of the the person being followed
+        const updatedFollowed = await databases.updateDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.userCollectionId,
+            followedId,
+            {
+                followers: newFollowersList
+            }
+        )
+        if(!updatedFollowed) throw Error
+        // remove the Id of the followed from the following list of the follower
+        const updatedFollower = await databases.updateDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.userCollectionId,
+            followerId,
+            {
+                following: newFollowingList
+            }
+        )
+        if(!updatedFollower) throw Error
+        return {status: 'ok'}
     }
     catch(error){
         console.log(error)

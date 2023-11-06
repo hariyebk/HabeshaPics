@@ -1,8 +1,7 @@
 import {useInfiniteQuery, useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
-import { SignInAccount, SignOutAccount, createPost, createUserAccount, getRecentPosts, likePosts, savePost, deleteSavedPost, getCurrentUser, getPostById, updatePost, deletePost, getInfinitePosts, searchPosts, getAllUsers, getAllPosts, getUserById } from "../appwrite/api"
-import { INewPost, INewUser, IUpdatePost } from "@/types"
+import { SignInAccount, SignOutAccount, createPost, createUserAccount, getRecentPosts, likePosts, savePost, deleteSavedPost, getCurrentUser, getPostById, updatePost, deletePost, getInfinitePosts, searchPosts, getAllUsers, getAllPosts, getUserById, updateUser, follow, unfollow } from "../appwrite/api"
+import { IFollowUser, INewPost, INewUser, IUnfollowUser, IUpdatePost, IUpdateUser } from "@/types"
 import { QUERY_KEYS} from "./queryKeys"
-import { toast } from "@/components/ui/use-toast";
 
 
 export const useCreateAccount = () => {
@@ -179,5 +178,65 @@ export const useGetUserById = (userId: string) => {
         queryKey: [QUERY_KEYS.GET_USER_BY_ID, userId],
         queryFn: () => getUserById(userId),
         enabled: Boolean(userId)
+    })
+}
+export const useUpdateUser = () => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: (user: IUpdateUser) => updateUser(user),
+        onSuccess: (data) => {
+            // re-fetch the updated user's data again
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.GET_USER_BY_ID, data?.$id]
+            })
+            // re-fetch the current user's data again
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.GET_CURRENT_USER]
+            })
+            // re-fetch all users again
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.GET_USERS]
+            })
+        }
+    })
+}
+export const useFollow = () => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: ({followedId, followerId}: IFollowUser) => follow(followedId, followerId),
+        onSuccess: () => {
+            // re-fetch the updated user's data again
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.GET_USER_BY_ID]
+            })
+            // re-fetch the current user's data again
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.GET_CURRENT_USER]
+            })
+            // re-fetch all users again
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.GET_USERS]
+            })
+        }
+    })
+}
+export const useUnFollow = () => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: ({followedId, newFollowersList, followerId, newFollowingList}: IUnfollowUser) => unfollow(followedId, newFollowersList, followerId, newFollowingList),
+        onSuccess: () => {
+            // re-fetch the updated user's data again
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.GET_USER_BY_ID]
+            })
+            // re-fetch the current user's data again
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.GET_CURRENT_USER]
+            })
+            // re-fetch all users again
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.GET_USERS]
+            })
+        }
     })
 }

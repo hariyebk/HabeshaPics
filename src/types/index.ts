@@ -16,6 +16,8 @@ label: string;
 export type IUpdateUser = {
 userId: string;
 name: string;
+username: string;
+email: string;
 bio: string;
 imageId: string;
 imageUrl: URL | string;
@@ -55,3 +57,15 @@ email: string;
 username: string;
 password: string;
 };
+
+export type IUnfollowUser = {
+    followedId: string, 
+    newFollowersList: string[], 
+    followerId: string, 
+    newFollowingList: string[]
+}
+
+export type IFollowUser = {
+    followedId: string, 
+    followerId: string
+}
