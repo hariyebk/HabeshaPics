@@ -19,14 +19,14 @@ export default function UserCard({user}: UserCardProps) {
         e.stopPropagation()
         // type guard 
         if(currentuser && !Following){
-            follow({followedId: user.$id , followerId: currentuser.$id})
             setFollowing(true)
+            follow({followedId: user.$id , followerId: currentuser.$id})
         }
         else if (currentuser && Following){
+            setFollowing(false)
             const newFollowersList: string[] = user.followers.filter((followerId: string) => followerId !== currentuser.$id)
             const newFollowingList : string[] = currentuser.following.filter((followingId: string) => followingId !== user.$id)
             unfollow({followedId: user.$id, newFollowersList , followerId: currentuser.$id, newFollowingList})
-            setFollowing(false)
         }
     }
     function handleNavigate(){
@@ -35,7 +35,7 @@ export default function UserCard({user}: UserCardProps) {
     return (
         <div onClick={handleNavigate} className='flex flex-col flex-1 gap-5 h-60 w-56 ml-8 items-center cursor-pointer border-dark-4 mt-10 py-8'>
             <div className='flex-center flex-col gap-2'>
-                <img src={user.imageUrl} className='rounded-full' width={40} height={40} alt='user-profile' />
+                <img src={user.imageUrl} className='rounded-full w-28 h-28' alt='user-profile' />
                 <p> {user.name} </p>
                 <p className='text-light-4 small-medium'> @{user.username} </p>
             </div>

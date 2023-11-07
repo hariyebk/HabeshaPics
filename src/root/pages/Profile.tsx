@@ -11,7 +11,7 @@ export default function Profile() {
     const [showLiked, setShowLiked] = useState(false)
     const {id} = useParams()
     const {data: user, isFetching: isFetchingUser} = useGetUserById(id!)
-    const {data: currentUser, isFetching: isFetchingCurrentUser} = useGetCurrentUser()
+    const {data: currentUser} = useGetCurrentUser()
     const {data: Allposts, isFetching: isFetchingAllPosts} = useGetAllPosts()
     // What I am doing here is not totally good when the application get's more users. it's not ideal to get all posts and filter out what the curret user liked.
     // since the liked posted inside the current user do not have the likes property we can not use the post card for this scenario.
@@ -34,7 +34,7 @@ export default function Profile() {
             </div>
         )
     }
-    if(isFetchingUser || isFetchingAllPosts || isFetchingCurrentUser){
+    if(isFetchingUser || isFetchingAllPosts){
         return(
             <div className="flex items-center w-full h-full">
                 <Loader />
@@ -42,24 +42,26 @@ export default function Profile() {
         )
     }
     return (
-        <div className="flex flex-1">
-            <div className="flex flex-1 flex-col mt-5 py-10 gap-14 w-full h-full">
+        <div className="common-container">
+            <div className="flex flex-1 flex-col py-10 gap-14 w-full h-full">
                 {/* user profile */}
                 <div className={`flex-center ${currentUser?.$id !== user?.$id && 'mr-32'}`}>
                     <div className= 'flex justify-between items-center gap-5'>
                     <img src = {user?.imageUrl} alt="profile-image" className= {`rounded-full h-14 w-14 md:h-28 md:w-28`} />
                         <div className="flex flex-col gap-3">
-                            <p className="h3-bold sm:h2-bold"> {user?.name.toUpperCase()} </p>
-                            <p className="text-light-4 body-medum mb-4"> @{user?.username} </p>
-                            <p className="small-regular pb-4"> {user?.bio} </p>
+                            <div className="md:flex-center md:flex-col">
+                                <p className="h3-bold sm:h2-bold md:pb-3"> {user?.name} </p>
+                                <p className="text-light-4 body-medum mb-4"> @{user?.username} </p>
+                                <p className="small-regular pb-4"> {user?.bio} </p>
+                            </div>
                             <div className="flex items-center justify-between gap-3 small-regular">
                                 <p> <span className="text-light-4 body-bold mr-1"> {user?.posts.length} </span> posts </p>
                                 <p> <span className="text-light-4 body-bold mr-1"> {user?.followers.length} </span> Followers </p>
-                                <p> <span className="text-light-4 body-bold mr-1"> 50 </span> Following </p>
+                                <p> <span className="text-light-4 body-bold mr-1"> {user?.following.length} </span> Following </p>
                             </div>
                         </div>
                         {/* Edit Profile */}
-                        {currentUser?.$id === user?.$id && <Link to={`/update-profile/${user?.$id}`} className="flex items-center justify-between gap-3 md:ml-10 bg-dark-4 px-5 py-3 rounded-lg">
+                        {currentUser?.$id === user?.$id && <Link to={`/update-profile/${user?.$id}`} className="hidden md:flex items-center justify-between gap-3 md:ml-10 bg-dark-4 px-5 py-3 rounded-lg">
                             <img src = '/assets/icons/edit.svg' width={30} height={30} alt="edit-profile" />
                             <p className="small-medium"> Edit Profile</p>
                         </Link>
@@ -67,7 +69,7 @@ export default function Profile() {
                     </div>
                 </div>
                 {/* Posts and Liked posts */}
-                <div className="flex justify-start items-start gap-4 ml-10 pl-56">
+                <div className="flex items-center justify-center md:pr-24 gap-4">
                     {currentUser?.$id === user?.$id && <>
                     <Button className="bg-dark-4 px-5 py-3" onClick={() => setShowLiked(false)}>
                         <img src="/assets/icons/posts.svg" width={20} height={20} alt="posts" />
@@ -80,8 +82,8 @@ export default function Profile() {
                     </>}
                 </div>
                 {/* posts */}
-                <div className="mx-10 px-20 md:overflow-x-hidden md:overflow-scroll md:custom-scrollbar">
-                    <GridPostList posts={showLiked ? likedPosts : posts} showUser = {false} showStats = {false} /> 
+                <div>
+                    <GridPostList posts={showLiked ? likedPosts : posts} showUser = {false} /> 
                 </div>
                 <div>
             </div>

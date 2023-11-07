@@ -16,9 +16,9 @@ export default function GridPostList({posts, showUser = true, showStats = true, 
     const {user} = useUserContext()
     return (
         <ul className='grid-container'>
-            {posts?.map((post: Models.Document): React.ReactNode => {
+            {posts?.map((post: Models.Document, index: number): React.ReactNode => {
                 return (
-                    <li key={post.$id} className='relative min-w-80'> 
+                    <li key={index} className='relative min-w-80'> 
                     <Link to={`/posts/${post.$id}`} className='grid-post_link'>
                         <img src={post.imageUrl} alt='post' className='h-full w-full object-cover'/>
                     </Link>
