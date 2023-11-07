@@ -6,6 +6,7 @@ import SignupForm from "./auth/forms/SignupForm"
 import AuthLayout from "./auth/AuthLayout"
 import RootLayout from "./root/RootLayout"
 import { Toaster } from "@/components/ui/toaster"
+import FollowList from "./components/shared/FollowList"
 
 
 export default function App(){
@@ -27,6 +28,8 @@ export default function App(){
                     <Route path="/update-post/:id" element = {<EditPost />} />
                     <Route path="/posts/:id/*" element = {<PostDetails />} />
                     <Route path="/profile/:id/*" element = {<Profile />} />
+                    <Route path="/followers/:id" element = {<FollowList showFollowers = {true} />} />
+                    <Route path="/following/:id" element = {<FollowList showFollowing = {true} />} />
                     <Route path="/update-profile/:id" element = {<UpdateProfile />} />
                 </Route>
             </Routes>

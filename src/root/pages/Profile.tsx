@@ -47,7 +47,7 @@ export default function Profile() {
                 {/* user profile */}
                 <div className={`flex-center ${currentUser?.$id !== user?.$id && 'mr-32'}`}>
                     <div className= 'flex justify-between items-center gap-5'>
-                    <img src = {user?.imageUrl} alt="profile-image" className= {`rounded-full h-14 w-14 md:h-28 md:w-28`} />
+                        <img src = {user?.imageUrl} alt="profile-image" className= {`rounded-full h-14 w-14 md:h-28 md:w-28`} />
                         <div className="flex flex-col gap-3">
                             <div className="md:flex-center md:flex-col">
                                 <p className="h3-bold sm:h2-bold md:pb-3"> {user?.name} </p>
@@ -55,9 +55,10 @@ export default function Profile() {
                                 <p className="small-regular pb-4"> {user?.bio} </p>
                             </div>
                             <div className="flex items-center justify-between gap-3 small-regular">
-                                <p> <span className="text-light-4 body-bold mr-1"> {user?.posts.length} </span> posts </p>
-                                <p> <span className="text-light-4 body-bold mr-1"> {user?.followers.length} </span> Followers </p>
-                                <p> <span className="text-light-4 body-bold mr-1"> {user?.following.length} </span> Following </p>
+                                <p> <span className="text-light-3 body-bold mr-1"> {user?.posts.length} </span> posts </p>
+                                <Link to = {`/followers/${user?.$id}`}> <p> <span className="text-light-3 body-bold mr-1"> {user?.followers.length} </span> Followers </p> </Link>
+                                <Link to={`/following/${user?.$id}`}> <p> <span className="text-light-3 body-bold mr-1"> {user?.following.length} </span> Following </p>
+                                </Link>
                             </div>
                         </div>
                         {/* Edit Profile */}

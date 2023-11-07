@@ -224,7 +224,8 @@ export const useUnFollow = () => {
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: ({followedId, newFollowersList, followerId, newFollowingList}: IUnfollowUser) => unfollow(followedId, newFollowersList, followerId, newFollowingList),
-        onSuccess: () => {
+        onSuccess: (data) => {
+            console.log(data)
             // re-fetch the updated user's data again
             queryClient.invalidateQueries({
                 queryKey: [QUERY_KEYS.GET_USER_BY_ID]

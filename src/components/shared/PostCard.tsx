@@ -3,6 +3,9 @@ import { Models } from 'appwrite'
 import { Link } from 'react-router-dom'
 import PostStats from './PostStats'
 import { useUserContext } from '@/context/AuthContext'
+import { Button } from '../ui/button'
+import { useFollow, useGetCurrentUser } from '@/lib/react-query/queriesAndMutations'
+import Loader from './Loader'
 
 type PostCardProps = {
     post: Models.Document
@@ -10,7 +13,13 @@ type PostCardProps = {
 
 export default function PostCard({post}: PostCardProps) {
     const {user} = useUserContext()
-    
+    const {data: currentUser} = useGetCurrentUser()
+    const {mutate: follow, isPending: isFollowing} = useFollow()
+    function handleFollow(){
+        if(currentUser){
+            follow({followedId: post.creator.$id, followerId: currentUser?.$id})
+        }
+    }
     // CREATOR IS THE USER WHO CREATED THE POST
     if(!post?.creator) return
     const tags: string[] = post.tags
@@ -28,9 +37,12 @@ export default function PostCard({post}: PostCardProps) {
                     </Link>
                     <div className='flex flex-col'>
                         {/* POST CREATOR NAME */}
-                        <p className='base-medium lg:body:bold text-light-1'> {post.creator.name} </p>
+                        <div className='flex justify-between items-center gap-6'>
+                            <p className='base-medium lg:body:bold text-light-1'> {post.creator.name} </p>
+                            {!currentUser?.following.includes(post.creator.$id) && currentUser?.$id !== post.creator.$id && <Button className='bg-primary-500 w-28 mt-1 px-6 h-8 rounded small-medium' onClick={handleFollow}> {isFollowing ? <Loader /> : "Follow"} </Button>}
+                        </div>
                         {/* POST DATE AND LOCATION */}
-                        <div className=' flex-center gap-2 text-light-3 mt-2'>
+                        <div className=' flex-center gap-2 text-light-3 mt-2 pr-32'>
                             <p className='subtle-semibold lg:small-regular'> {formatDistanceFromNow(post.$createdAt)}</p>
                             <p className='subtle-semibold lg:small-regular'> {post.location} </p>
                         </div>

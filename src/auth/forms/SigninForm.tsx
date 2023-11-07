@@ -35,7 +35,8 @@ function SignInForm() {
 
         if(!session){
             return toast({
-                title: "sign in failed. please try again"
+                title: "sign in failed. please try again",
+                variant: "destructive"
             })
         }    
         // checks if the user is logged-in and a session is created, and then it a adds the user to the global state.
