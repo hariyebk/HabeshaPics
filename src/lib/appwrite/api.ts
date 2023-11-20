@@ -332,12 +332,9 @@ export async function deletePost(postId: string, imageId: string) {
         console.log(error)
     }   
 }
-export async function getInfinitePosts({pageParam}: {pageParam: string}) {
+export async function getInfinitePosts(){
     // A query to get the most recent 20 posts
-    const query = [Query.orderDesc('$updatedAt'), Query.limit(20)]
-    if(pageParam){
-        query.push(Query.cursorAfter(pageParam))
-    }
+    const query = [Query.orderDesc('$updatedAt'), Query.limit(10)]
     try{
         const posts = await databases.listDocuments(
             appwriteConfig.databaseId,

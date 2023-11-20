@@ -2,7 +2,7 @@ import Loader from "@/components/shared/Loader"
 import PostStats from "@/components/shared/PostStats"
 import { Button } from "@/components/ui/button"
 import { useUserContext } from "@/context/AuthContext"
-import { useGetPostById } from "@/lib/react-query/queriesAndMutations"
+import { useDeletePost, useGetPostById } from "@/lib/react-query/queriesAndMutations"
 import { formatDistanceFromNow } from "@/lib/utils"
 
 import { Link, useNavigate, useParams } from "react-router-dom"
@@ -11,10 +11,12 @@ import { Link, useNavigate, useParams } from "react-router-dom"
 export default function PostDetails() {
     const {id: postId} = useParams()
     const {user} = useUserContext()
+    const {mutate: deletePost, isPending:isDeletingPost} = useDeletePost()
     const {data: post, isLoading: isGettingPost} = useGetPostById(postId || '')
     const navigate = useNavigate()
     function handleDelete(){
-
+        deletePost({postId: postId!, imageId: post?.imageUrl})
+        navigate("/")
     }
     if(isGettingPost){
         return(
@@ -54,9 +56,13 @@ export default function PostDetails() {
                             <img src="/assets/icons/edit.svg" width={24} height={24} alt="edit" />
                         </Link>
                         {/* DELETE POST */}
+                        {isDeletingPost ? (
+                            <Loader />
+                        ) :
                         <Button onClick={handleDelete} variant='ghost' className= {`${user.id !== post?.creator.$id ? 'hidden': "ghost_details_delete-btn"}`}>
                             <img src="/assets/icons/delete.svg" width={24} height={24} alt="delete" />
                         </Button>
+                        }
                     </div>
                 </div>
                 <hr className="border w-full border-dark-4/80" />

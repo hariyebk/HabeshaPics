@@ -1,6 +1,6 @@
-import {useInfiniteQuery, useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
 import { SignInAccount, SignOutAccount, createPost, createUserAccount, getRecentPosts, likePosts, savePost, deleteSavedPost, getCurrentUser, getPostById, updatePost, deletePost, getInfinitePosts, searchPosts, getAllUsers, getAllPosts, getUserById, updateUser, follow, unfollow } from "../appwrite/api"
-import { IFollowUser, INewPost, INewUser, IUnfollowUser, IUpdatePost, IUpdateUser } from "@/types"
+import {IFollowUser, INewPost, INewUser, IUnfollowUser, IUpdatePost, IUpdateUser } from "@/types"
 import { QUERY_KEYS} from "./queryKeys"
 
 
@@ -27,6 +27,15 @@ export const useCreatePost = () => {
             // keep posts up to data
             queryClient.invalidateQueries({
                 queryKey: [QUERY_KEYS.GET_RECENT_POSTS]
+            })
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.GET_ALL_POSTS]
+            })
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.GET_POSTS]
+            })
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.GET_USER_POSTS]
             })
         }
     })
@@ -134,24 +143,23 @@ export const useDeletePost = () => {
             queryClient.invalidateQueries({
                 queryKey: [QUERY_KEYS.GET_RECENT_POSTS]
             })
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.GET_ALL_POSTS]
+            })
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.GET_POSTS]
+            })
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.GET_USER_POSTS]
+            })
         }
     })
 }
 export const useGetPosts = () => {
-    return useInfiniteQuery({
+    return useQuery({
         queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
-        queryFn: getInfinitePosts,
-        getNextPageParam: (lastPage): number | null => {
-        // If there's no data, there are no more pages.
-        if (lastPage && lastPage.documents.length === 0) {
-            return null;
-        }
-        // Use the $id of the last document as the cursor.
-        const lastId = parseInt(lastPage?.documents[lastPage?.documents.length - 1].$id!);
-        return lastId;
-        }, 
-        initialPageParam: 1
-    });
+        queryFn: getInfinitePosts
+    })
 }
 export const useSearchPosts = (searchTerm: string) => {
     return useQuery({

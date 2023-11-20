@@ -2,35 +2,27 @@ import GridPostList from "@/components/shared/GridPostList";
 import Loader from "@/components/shared/Loader";
 import SearchResults from "@/components/shared/SearchResults";
 import { Input } from "@/components/ui/input";
-import { useUserContext } from "@/context/AuthContext";
 import useDebounce from "@/hooks/useDebounce";
 import { useGetCurrentUser, useGetPosts, useSearchPosts } from "@/lib/react-query/queriesAndMutations";
-import { useEffect, useState } from "react";
-import { useInView } from "react-intersection-observer";
+import { useState } from "react";
 
 export default function Explore() {
     // Getting all posts 
-    const {data: posts, fetchNextPage, hasNextPage} = useGetPosts()
+    const {data: posts, isFetching:isFetchingAllPosts} = useGetPosts()
     const {data: currentUser} = useGetCurrentUser()
     // The Explore page should display all posts made by other creators not the current user. in other words when the user opens the explore page , they shouldn't see their own posts. 
-    const filteredPosts = posts?.pages.find((items) => items?.documents.length > 0)?.documents.filter((post) => post.creator.accountId !== currentUser?.accountId)
+    const filteredPosts = posts?.documents.filter((post) => post?.creator.accountId !== currentUser?.accountId)
     // search value (controlled element)
     const [searchValue, setSearchValue] = useState('')
     // Looking for when the user reached the bootom of the viewPort scrooling, to implement infinite scrolling
-    const {ref, inView} = useInView()
+    // const {ref, inView} = useInView()
     // debouncing
     const debouncedValue = useDebounce(searchValue, 500) 
     // search results
     const {data: searchedPosts, isFetching: isSearchFetching} = useSearchPosts(debouncedValue)
-
-    useEffect(() => {
-        // If our reference is in the view port an there is no search value . we wiil fetch the Next page.
-        if(inView && !searchValue) fetchNextPage()
-    }, [searchValue, inView])
-
     
     // if the All posts are not fetched yet , display the loader.
-    if(!posts){
+    if(!posts || isFetchingAllPosts){
         return (
             <div className="flex-center w-full h-full">
                 <Loader />
@@ -72,20 +64,12 @@ export default function Explore() {
             {/* SEARCH RESULTS OR ALL POSTS TO EXPLORE */}
             <div className="flex flex-wrap gap-9 w-full max-w-5xl">
                 {shouldShowSearchResults ? (
-                <SearchResults searchedPosts={searchedPosts} isSearchFetching = {isSearchFetching}
+                <SearchResults searchedPosts={searchedPosts!} isSearchFetching = {isSearchFetching}
                 />
                 ) : (
                 <GridPostList posts={filteredPosts} showOnlyLikes = {true}/>
                 )}
             </div>
-            {
-                hasNextPage && !searchValue && (
-                    <div ref = {ref} className="mt-10">
-                        <Loader />
-                    </div>
-                )
-            }
-            
         </div>
     )
 }

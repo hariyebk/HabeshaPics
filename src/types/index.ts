@@ -1,3 +1,5 @@
+import { Models } from "appwrite";
+
 export type IContextType = {
     user: IUser,
     isLoading: boolean,
@@ -68,4 +70,9 @@ export type IUnfollowUser = {
 export type IFollowUser = {
     followedId: string, 
     followerId: string
+}
+
+export type IAllPosts = {
+    total: number,
+    documents: Models.Document[]
 }

@@ -1,13 +1,9 @@
-import { Models } from 'appwrite'
 import Loader from './Loader'
 import GridPostList from './GridPostList'
+import { Models } from 'appwrite'
 
-interface searchedPostsProps {
-    total: number,
-    documents: Models.Document[]
-}
 type searchResultsProps = {
-    searchedPosts: searchedPostsProps
+    searchedPosts: Models.Document | Models.DocumentList<Models.Document>
     isSearchFetching: boolean
 }
 

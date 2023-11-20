@@ -22,7 +22,7 @@ export default function Topbar() {
                 {/* SNAPGRAM LOGO */}
                 <Link to= '/' className='flex gap-3 items-center'>
                     <img 
-                    src='/assets/images/logo.svg' 
+                    src='/assets/images/logo.png' 
                     alt='logo'
                     width={130}
                     height={325}/>
